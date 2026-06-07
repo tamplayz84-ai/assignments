@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>My Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --border: #2a2a2a;
+    --accent: #c9a84c;
+    --accent2: #e8c97a;
+    --text: #e8e8e8;
+    --muted: #888;
+    --danger: #e05c5c;
+  }
+
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(13,13,13,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2.5rem; height: 64px;
+  }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--accent); cursor: pointer; }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; letter-spacing: 0.05em; transition: color 0.2s; cursor: pointer; }
+  .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+
+  /* PAGES */
+  .page { display: none; padding-top: 64px; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* HOME */
+  #home {
+    display: none;
+    align-items: center; justify-content: center;
+    min-height: 100vh; padding-top: 64px;
+    background: radial-gradient(ellipse at 30% 50%, #1a1500 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, #0a1a1a 0%, transparent 50%),
+                var(--bg);
+  }
+  #home.active { display: flex; }
+  .hero { max-width: 800px; padding: 2rem; text-align: center; }
+  .hero-tag { display: inline-block; border: 1px solid var(--accent); color: var(--accent); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.4rem 1rem; border-radius: 20px; margin-bottom: 2rem; }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 900; line-height: 1.1; margin-bottom: 1.5rem; }
+  .hero h1 span { color: var(--accent); }
+  .hero p { color: var(--muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto 2.5rem; line-height: 1.7; }
+  .btn { display: inline-block; padding: 0.85rem 2rem; border-radius: 4px; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; }
+  .btn-primary { background: var(--accent); color: #000; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-left: 1rem; }
+  .btn-outline:hover { background: var(--accent); color: #000; }
+  .btn-sm { padding: 0.5rem 1rem; font-size: 0.82rem; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { opacity: 0.85; }
+
+  /* SECTION */
+  .section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 0.5rem; }
+  .section-line { width: 60px; height: 3px; background: var(--accent); margin-bottom: 3rem; }
+
+  /* ABOUT */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+  @media(max-width:700px){ .about-grid { grid-template-columns:1fr; } }
+  .about-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 2rem; }
+  .about-card h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--accent); margin-bottom: 1rem; }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+  .tag { background: #1e1e00; color: var(--accent); font-size: 0.78rem; padding: 0.35rem 0.75rem; border-radius: 20px; border: 1px solid #3a3000; }
+  .exp-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .exp-item:last-child { border-bottom: none; margin-bottom: 0; }
+  .exp-item strong { display: block; color: var(--text); }
+  .exp-item span { color: var(--muted); font-size: 0.85rem; }
+
+  /* PROJECTS */
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+  .project-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.75rem; transition: border-color 0.2s, transform 0.2s; }
+  .project-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .project-card h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 0.75rem; }
+  .project-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; }
+  .project-tech { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem; }
+  .project-links { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .project-links a { color: var(--accent); font-size: 0.82rem; text-decoration: none; border: 1px solid var(--accent); padding: 0.3rem 0.75rem; border-radius: 4px; transition: all 0.2s; }
+  .project-links a:hover { background: var(--accent); color: #000; }
+  .loading { color: var(--muted); text-align: center; padding: 3rem; }
+
+  /* CONTACT */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 3rem; }
+  @media(max-width:700px){ .contact-grid { grid-template-columns:1fr; } }
+  .contact-info p { color: var(--muted); line-height: 1.7; margin-bottom: 2rem; }
+  form { display: flex; flex-direction: column; gap: 1.25rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width:500px){ .form-row { grid-template-columns:1fr; } }
+  input, textarea, select {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); padding: 0.85rem 1rem; border-radius: 4px;
+    font-family: inherit; font-size: 0.9rem; width: 100%;
+    transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 140px; }
+  .form-msg { padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; display: none; }
+  .form-msg.success { background: #0a200a; color: #5cb85c; border: 1px solid #2a5a2a; display: block; }
+  .form-msg.error { background: #200a0a; color: var(--danger); border: 1px solid #5a2a2a; display: block; }
+
+  /* ADMIN PAGES */
+  .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { text-align: left; padding: 0.75rem 1rem; background: var(--surface); color: var(--accent); font-weight: 500; border-bottom: 1px solid var(--border); }
+  td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+  td:first-child { color: var(--text); }
+  tr:hover td { background: var(--surface); }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; display: none; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #1a1a1a; border: 1px solid var(--border); border-radius: 10px; padding: 2rem; width: 100%; max-width: 540px; }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 1.5rem; }
+  .modal form { gap: 1rem; }
+  label { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.25rem; display: block; }
+
+  /* LOGIN */
+  .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding-top: 64px; }
+  .login-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 2.5rem; width: 100%; max-width: 400px; }
+  .login-box h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 1.75rem; }
+
+  footer { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 4rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="navigate('home')">Alex.dev</div>
+  <div class="nav-links">
+    <a onclick="navigate('home')" id="nav-home">Home</a>
+    <a onclick="navigate('about')" id="nav-about">About</a>
+    <a onclick="navigate('projects')" id="nav-projects">Projects</a>
+    <a onclick="navigate('contact')" id="nav-contact">Contact</a>
+    <a onclick="navigate('admin-login')" id="nav-admin" style="color:var(--accent)">Admin</a>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div class="page" id="home">
+  <div class="hero">
+    <div class="hero-tag">✦ Full Stack Developer</div>
+    <h1>Hi, I'm <span>Alex Johnson</span><br/>I Build for the Web</h1>
+    <p>I craft clean, performant web applications from database to deployment. Let's build something remarkable together.</p>
+    <button class="btn btn-primary" onclick="navigate('projects')">View My Work</button>
+    <button class="btn btn-outline" onclick="navigate('contact')">Get in Touch</button>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="page" id="about">
+  <div class="section">
+    <h2 class="section-title">About Me</h2>
+    <div class="section-line"></div>
+    <div class="about-grid">
+      <div>
+        <div class="about-card" style="margin-bottom:1.5rem">
+          <h3>Education</h3>
+          <div class="exp-item">
+            <strong>BSc Computer Science</strong>
+            <span>University of Technology — 2020–2024</span>
+          </div>
+          <div class="exp-item">
+            <strong>Full Stack Web Development</strong>
+            <span>Online Certification — 2023</span>
+          </div>
+        </div>
+        <div class="about-card">
+          <h3>Experience</h3>
+          <div class="exp-item">
+            <strong>Junior Developer — TechCorp</strong>
+            <span>2024 – Present · Built REST APIs and React dashboards</span>
+          </div>
+          <div class="exp-item">
+            <strong>Freelance Web Developer</strong>
+            <span>2022 – 2024 · 10+ client projects delivered</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="about-card">
+          <h3>Skills</h3>
+          <p style="color:var(--muted);font-size:.9rem;margin-bottom:1rem">Technologies I work with:</p>
+          <strong style="font-size:.85rem;color:var(--accent)">Frontend</strong>
+          <div class="skill-tags">
+            <span class="tag">HTML5</span><span class="tag">CSS3</span><span class="tag">JavaScript</span><span class="tag">React</span><span class="tag">Tailwind CSS</span>
+          </div>
+          <strong style="font-size:.85rem;color:var(--accent);display:block;margin-top:1rem">Backend</strong>
+          <div class="skill-tags">
+            <span class="tag">Python</span><span class="tag">Flask</span><span class="tag">FastAPI</span><span class="tag">Node.js</span>
+          </div>
+          <strong style="font-size:.85rem;color:var(--accent);display:block;margin-top:1rem">Database & Tools</strong>
+          <div class="skill-tags">
+            <span class="tag">SQLite</span><span class="tag">MySQL</span><span class="tag">PostgreSQL</span><span class="tag">Git</span><span class="tag">Postman</span><span class="tag">Docker</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>© 2025 Alex Johnson. All rights reserved.</footer>
+</div>
+
+<!-- PROJECTS -->
+<div class="page" id="projects">
+  <div class="section">
+    <h2 class="section-title">My Projects</h2>
+    <div class="section-line"></div>
+    <div class="projects-grid" id="projects-grid">
+      <p class="loading">Loading projects...</p>
+    </div>
+  </div>
+  <footer>© 2025 Alex Johnson.</footer>
+</div>
+
+<!-- CONTACT -->
+<div class="page" id="contact">
+  <div class="section">
+    <h2 class="section-title">Get in Touch</h2>
+    <div class="section-line"></div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <p>Have a project in mind or want to collaborate? Fill out the form and I'll get back to you within 24 hours.</p>
+        <p>📧 alex@example.com</p>
+        <p style="margin-top:.5rem">📍 Lahore, Pakistan</p>
+      </div>
+      <form id="contact-form">
+        <div class="form-row">
+          <div><label>Your Name</label><input type="text" id="c-name" placeholder="John Doe" required /></div>
+          <div><label>Email Address</label><input type="email" id="c-email" placeholder="john@example.com" required /></div>
+        </div>
+        <div><label>Subject</label><input type="text" id="c-subject" placeholder="Project Inquiry" required /></div>
+        <div><label>Message</label><textarea id="c-message" placeholder="Tell me about your project..." required></textarea></div>
+        <div class="form-msg" id="contact-msg"></div>
+        <button type="submit" class="btn btn-primary">Send Message →</button>
+      </form>
+    </div>
+  </div>
+  <footer>© 2025 Alex Johnson.</footer>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div class="page" id="admin-login">
+  <div class="login-wrap">
+    <div class="login-box">
+      <h2>Admin Login</h2>
+      <form id="login-form" style="display:flex;flex-direction:column;gap:1rem">
+        <div><label>Username</label><input type="text" id="a-user" placeholder="admin" /></div>
+        <div><label>Password</label><input type="password" id="a-pass" placeholder="••••••••" /></div>
+        <div class="form-msg" id="login-msg"></div>
+        <button type="submit" class="btn btn-primary">Login</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div class="page" id="admin-dashboard">
+  <div class="section">
+    <div class="admin-header">
+      <div>
+        <h2 class="section-title">Admin Dashboard</h2>
+        <div class="section-line" style="margin-bottom:0"></div>
+      </div>
+      <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="navigate('admin-messages')">📨 Messages</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Add Project</button>
+        <button class="btn btn-sm" style="background:#222;color:var(--muted)" onclick="logout()">Logout</button>
+      </div>
+    </div>
+    <div id="admin-projects-grid" style="overflow-x:auto">
+      <p class="loading">Loading...</p>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN MESSAGES -->
+<div class="page" id="admin-messages">
+  <div class="section">
+    <div class="admin-header">
+      <div>
+        <h2 class="section-title">Contact Messages</h2>
+        <div class="section-line" style="margin-bottom:0"></div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="navigate('admin-dashboard')">← Back to Projects</button>
+    </div>
+    <div id="messages-table" style="overflow-x:auto"><p class="loading">Loading...</p></div>
+  </div>
+</div>
+
+<!-- PROJECT MODAL -->
+<div class="modal-overlay" id="project-modal">
+  <div class="modal">
+    <h3 id="modal-title">Add Project</h3>
+    <form id="project-form" style="display:flex;flex-direction:column;gap:1rem">
+      <input type="hidden" id="proj-id" />
+      <div><label>Title</label><input type="text" id="proj-title" required /></div>
+      <div><label>Description</label><textarea id="proj-desc" style="min-height:90px" required></textarea></div>
+      <div><label>Technologies (comma-separated)</label><input type="text" id="proj-tech" required /></div>
+      <div><label>GitHub Link</label><input type="url" id="proj-github" /></div>
+      <div><label>Live Demo Link</label><input type="url" id="proj-live" /></div>
+      <div style="display:flex;gap:.75rem;justify-content:flex-end">
+        <button type="button" class="btn btn-sm" style="background:#222;color:var(--muted)" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Save Project</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:5000';
+
+// ── ROUTING ──────────────────────────────────────────────────────────────────
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  const el = document.getElementById(page);
+  if (el) el.classList.add('active');
+  const navEl = document.getElementById('nav-' + page.replace('admin-', ''));
+  if (navEl) navEl.classList.add('active');
+  if (page === 'projects') loadProjects();
+  if (page === 'admin-dashboard') loadAdminProjects();
+  if (page === 'admin-messages') loadMessages();
+}
+
+// ── PROJECTS (public) ─────────────────────────────────────────────────────
+async function loadProjects() {
+  const grid = document.getElementById('projects-grid');
+  grid.innerHTML = '<p class="loading">Loading projects...</p>';
+  try {
+    const res = await fetch(`${API}/projects`);
+    const projects = await res.json();
+    if (!projects.length) { grid.innerHTML = '<p class="loading">No projects yet.</p>'; return; }
+    grid.innerHTML = projects.map(p => `
+      <div class="project-card">
+        <h3>${esc(p.title)}</h3>
+        <p>${esc(p.description)}</p>
+        <div class="project-tech">${p.technologies.split(',').map(t => `<span class="tag">${esc(t.trim())}</span>`).join('')}</div>
+        <div class="project-links">
+          ${p.github_link ? `<a href="${p.github_link}" target="_blank">GitHub</a>` : ''}
+          ${p.live_link ? `<a href="${p.live_link}" target="_blank">Live Demo</a>` : ''}
+        </div>
+      </div>`).join('');
+  } catch { grid.innerHTML = '<p class="loading">Could not load projects. Is the backend running?</p>'; }
+}
+
+// ── CONTACT FORM ─────────────────────────────────────────────────────────
+document.getElementById('contact-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const msg = document.getElementById('contact-msg');
+  msg.className = 'form-msg';
+  try {
+    const res = await fetch(`${API}/contact`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        name: document.getElementById('c-name').value,
+        email: document.getElementById('c-email').value,
+        subject: document.getElementById('c-subject').value,
+        message: document.getElementById('c-message').value
+      })
+    });
+    const data = await res.json();
+    if (res.ok) { msg.className='form-msg success'; msg.textContent=data.message; e.target.reset(); }
+    else { msg.className='form-msg error'; msg.textContent=data.error; }
+  } catch { msg.className='form-msg error'; msg.textContent='Server not reachable. Try again later.'; }
+});
+
+// ── ADMIN LOGIN ─────────────────────────────────────────────────────────
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const msg = document.getElementById('login-msg');
+  try {
+    const res = await fetch(`${API}/login`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({ username: document.getElementById('a-user').value, password: document.getElementById('a-pass').value })
+    });
+    const data = await res.json();
+    if (res.ok) navigate('admin-dashboard');
+    else { msg.className='form-msg error'; msg.textContent=data.error; }
+  } catch { msg.className='form-msg error'; msg.textContent='Cannot connect to server.'; }
+});
+
+async function logout() {
+  await fetch(`${API}/logout`, { method:'POST', credentials:'include' });
+  navigate('home');
+}
+
+// ── ADMIN PROJECTS ─────────────────────────────────────────────────────
+async function loadAdminProjects() {
+  const el = document.getElementById('admin-projects-grid');
+  el.innerHTML = '<p class="loading">Loading...</p>';
+  try {
+    const res = await fetch(`${API}/projects`);
+    const projects = await res.json();
+    if (!projects.length) { el.innerHTML = '<p class="loading">No projects yet. Add one!</p>'; return; }
+    el.innerHTML = `<table>
+      <thead><tr><th>Title</th><th>Technologies</th><th>GitHub</th><th>Actions</th></tr></thead>
+      <tbody>${projects.map(p => `
+        <tr>
+          <td><strong>${esc(p.title)}</strong><br/><small style="color:var(--muted)">${esc(p.description.substring(0,80))}...</small></td>
+          <td>${p.technologies.split(',').slice(0,3).map(t=>`<span class="tag">${esc(t.trim())}</span>`).join(' ')}</td>
+          <td>${p.github_link ? `<a href="${p.github_link}" target="_blank" style="color:var(--accent)">Link</a>` : '—'}</td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-sm btn-outline" onclick="openEditModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">Edit</button>
+            <button class="btn btn-sm btn-danger" style="margin-left:.5rem" onclick="deleteProject(${p.id})">Delete</button>
+          </td>
+        </tr>`).join('')}
+      </tbody></table>`;
+  } catch { el.innerHTML = '<p class="loading">Error loading. Are you logged in?</p>'; }
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────
+function openAddModal() {
+  document.getElementById('modal-title').textContent = 'Add Project';
+  document.getElementById('proj-id').value = '';
+  document.getElementById('project-form').reset();
+  document.getElementById('project-modal').classList.add('open');
+}
+function openEditModal(p) {
+  document.getElementById('modal-title').textContent = 'Edit Project';
+  document.getElementById('proj-id').value = p.id;
+  document.getElementById('proj-title').value = p.title;
+  document.getElementById('proj-desc').value = p.description;
+  document.getElementById('proj-tech').value = p.technologies;
+  document.getElementById('proj-github').value = p.github_link || '';
+  document.getElementById('proj-live').value = p.live_link || '';
+  document.getElementById('project-modal').classList.add('open');
+}
+function closeModal() { document.getElementById('project-modal').classList.remove('open'); }
+
+document.getElementById('project-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const id = document.getElementById('proj-id').value;
+  const body = {
+    title: document.getElementById('proj-title').value,
+    description: document.getElementById('proj-desc').value,
+    technologies: document.getElementById('proj-tech').value,
+    github_link: document.getElementById('proj-github').value,
+    live_link: document.getElementById('proj-live').value
+  };
+  const url = id ? `${API}/projects/${id}` : `${API}/projects`;
+  const method = id ? 'PUT' : 'POST';
+  await fetch(url, { method, headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify(body) });
+  closeModal();
+  loadAdminProjects();
+});
+
+async function deleteProject(id) {
+  if (!confirm('Delete this project?')) return;
+  await fetch(`${API}/projects/${id}`, { method:'DELETE', credentials:'include' });
+  loadAdminProjects();
+}
+
+// ── MESSAGES ─────────────────────────────────────────────────────────────
+async function loadMessages() {
+  const el = document.getElementById('messages-table');
+  el.innerHTML = '<p class="loading">Loading...</p>';
+  try {
+    const res = await fetch(`${API}/messages`, { credentials:'include' });
+    if (res.status === 401) { el.innerHTML='<p class="loading">Unauthorized. Please login first.</p>'; return; }
+    const msgs = await res.json();
+    if (!msgs.length) { el.innerHTML='<p class="loading">No messages yet.</p>'; return; }
+    el.innerHTML = `<table>
+      <thead><tr><th>Name</th><th>Email</th><th>Subject</th><th>Message</th><th>Date</th><th></th></tr></thead>
+      <tbody>${msgs.map(m=>`
+        <tr>
+          <td>${esc(m.name)}</td>
+          <td>${esc(m.email)}</td>
+          <td>${esc(m.subject)}</td>
+          <td style="max-width:260px">${esc(m.message.substring(0,100))}${m.message.length>100?'…':''}</td>
+          <td style="white-space:nowrap">${m.created_at ? m.created_at.substring(0,10) : ''}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="deleteMessage(${m.id})">Delete</button></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+  } catch { el.innerHTML='<p class="loading">Error loading messages.</p>'; }
+}
+
+async function deleteMessage(id) {
+  if (!confirm('Delete this message?')) return;
+  await fetch(`${API}/messages/${id}`, { method:'DELETE', credentials:'include' });
+  loadMessages();
+}
+
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Start
+navigate('home');
+</script>
+</body>
+</html>
